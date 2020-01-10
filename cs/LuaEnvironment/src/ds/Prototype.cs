@@ -71,11 +71,74 @@ public class Prototype
             {
                 line = LineInfo[i].ToString();
             }
-            builder.AppendLine($"\t{i + 1}\t[{line}]\t0x{Code[i]:X08}");
+
+            Instruction ins = Code[i];
+            builder.Append($"\t{i + 1}\t[{line}]\t{ins.OpName} \t");
+            builder.Append(PrintOperands(ins));
+            builder.AppendLine();
         }
 
         return builder.ToString();
+
+        string PrintOperands(Instruction i)
+        {
+            StringBuilder builder = new StringBuilder();
+            switch (i.OpFormat)
+            {
+                case OpFormat.IABC:
+                    var (a, b, c) = i.ABC();
+                    builder.Append(a.ToString());
+                    if (i.BMode != OpArgType.OpArgN)
+                    {
+                        if (b > 0xff)
+                        {
+                            builder.Append($" {-1 - b & 0xff}");
+                        }
+                        else
+                        {
+                            builder.Append($" {b}");
+                        }
+                    }
+                    if (i.CMode != OpArgType.OpArgN)
+                    {
+                        if (c > 0xff)
+                        {
+                            builder.Append($" {-1 - c & 0xff}");
+                        }
+                        else
+                        {
+                            builder.Append($" {c}");
+                        }
+                    }
+                    break;
+                case OpFormat.IABx:
+                    var (a1, bx) = i.ABx();
+                    builder.Append(a1.ToString());
+                    if (i.BMode == OpArgType.OpArgK)
+                    {
+                        builder.Append($" {-1 - bx}");
+                    }
+                    else if (i.BMode == OpArgType.OpArgU)
+                    {
+                        builder.Append($" {bx}");
+                    }
+                    break;
+                case OpFormat.IAsBx:
+                    var (a2, sbx) = i.AsBx();
+                    builder.Append($"{a2} {sbx}");
+                    break;
+                case OpFormat.IAx:
+                    var a3 = i.Ax();
+                    builder.Append($"{a3}");
+                    break;
+                default:
+                    builder.Append("???");
+                    break;
+            }
+            return builder.ToString();
+        }
     }
+
 
     private string DetailToString()
     {
