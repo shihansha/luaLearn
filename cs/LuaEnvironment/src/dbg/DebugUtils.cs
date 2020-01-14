@@ -14,7 +14,7 @@ internal static class LuaDebugUtils
             {
                 case LuaType.Boolean: builder.Append($"[{ls.ToBoolean(i).ToString().ToLower()}]"); break;
                 case LuaType.Number: builder.Append($"[{ls.ToNumber(i)}]"); break;
-                case LuaType.String: builder.Append($"[{ls.ToString(i)}]"); break;
+                case LuaType.String: builder.Append($"[\"{ls.ToString(i)}\"]"); break;
                 default: builder.Append($"[{ls.TypeName(t)}]"); break;
             }
         }

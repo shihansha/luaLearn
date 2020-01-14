@@ -63,11 +63,7 @@ public partial class LuaState
     public (long, bool) ToIntegerX(int idx)
     {
         var val = stack.Get(idx);
-        return val.Value switch
-        {
-            Int64 n => (n, true),
-            _ => (0, false)
-        };
+        return val.ToInteger();
     }
 
     public double ToNumber(int idx)
@@ -78,13 +74,8 @@ public partial class LuaState
 
     public (double, bool) ToNumberX(int idx)
     {
-        var val = stack[idx];
-        return val.Value switch
-        {
-            double n => (n, true),
-            Int64 n => (n, true),
-            _ => (0, false)
-        };
+        var val = stack.Get(idx);
+        return val.ToFloat();
     }
 
     public string ToString(int idx)

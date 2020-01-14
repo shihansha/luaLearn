@@ -38,4 +38,9 @@ public interface ILuaState
     void PushInteger(Int64 n);
     void PushNumber(double n);
     void PushString(string s);
+    // math functions
+    void Arith(ArithOp op);
+    bool Compare(int idx1, int idx2, CompareOp op);
+    void Len(int idx);
+    void Concat(int n);
 }
