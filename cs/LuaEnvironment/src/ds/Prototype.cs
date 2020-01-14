@@ -92,7 +92,7 @@ public class Prototype
                     {
                         if (b > 0xff)
                         {
-                            builder.Append($" {-1 - b & 0xff}");
+                            builder.Append($" {-1 - (b & 0xff)}");
                         }
                         else
                         {
@@ -103,7 +103,7 @@ public class Prototype
                     {
                         if (c > 0xff)
                         {
-                            builder.Append($" {-1 - c & 0xff}");
+                            builder.Append($" {-1 - (c & 0xff)}");
                         }
                         else
                         {

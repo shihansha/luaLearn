@@ -79,9 +79,7 @@ internal class Reader
 
     private void Panic(string str)
     {
-        Console.WriteLine(str);
-        Console.WriteLine(new System.Diagnostics.StackTrace(true));
-        Environment.Exit(1);
+        throw new Exception(str);
     }
 
     public void CheckHeader()
