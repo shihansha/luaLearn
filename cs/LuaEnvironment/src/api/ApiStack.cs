@@ -1,6 +1,6 @@
 using System;
 
-public partial class LuaState : ILuaState
+public partial class LuaState
 {
     public int GetTop()
     {

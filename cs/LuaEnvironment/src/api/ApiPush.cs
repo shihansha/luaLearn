@@ -1,6 +1,6 @@
 using System;
 
-public partial class LuaState : ILuaState
+public partial class LuaState
 {
     public void PushNil() => stack.Push(new LuaValue(null));
     public void PushBoolean(bool b) => stack.Push(new LuaValue(b));

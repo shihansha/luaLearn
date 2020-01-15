@@ -1,3 +1,5 @@
+using System;
+
 internal enum OpFormat
 {
     IABC = 0,
@@ -73,8 +75,9 @@ internal class OpCodeInfo
     public OpArgType ArgCMode; // C arg mode
     public OpFormat OpMode; // op mode
     public string Name;
+    public Action<Instruction, ILuaVM> Action;
 
-    public OpCodeInfo(byte t, byte a, OpArgType b, OpArgType c, OpFormat mode, string name)
+    public OpCodeInfo(byte t, byte a, OpArgType b, OpArgType c, OpFormat mode, string name, Action<Instruction, ILuaVM> action)
     {
         TestFlag = t;
         SetAFFlag = a;
@@ -82,60 +85,61 @@ internal class OpCodeInfo
         ArgCMode = c;
         OpMode = mode;
         Name = name;
+        Action = action;
     }
 
     public readonly static OpCodeInfo[] OpCodeInfos = new OpCodeInfo[]
     {
-        new OpCodeInfo(0, 1, OpArgType.OpArgR, OpArgType.OpArgN, OpFormat.IABC, "MOVE    "),
-        new OpCodeInfo(0, 1, OpArgType.OpArgK, OpArgType.OpArgN, OpFormat.IABx, "LOADK   "),
-        new OpCodeInfo(0, 1, OpArgType.OpArgN, OpArgType.OpArgN, OpFormat.IABx, "LOADKX  "),
-        new OpCodeInfo(0, 1, OpArgType.OpArgU, OpArgType.OpArgU, OpFormat.IABC, "LOADBOOL"),
-        new OpCodeInfo(0, 1, OpArgType.OpArgU, OpArgType.OpArgN, OpFormat.IABC, "LOADNIL "),
-        new OpCodeInfo(0, 1, OpArgType.OpArgU, OpArgType.OpArgN, OpFormat.IABC, "GETUPVAL"),
-        new OpCodeInfo(0, 1, OpArgType.OpArgU, OpArgType.OpArgK, OpFormat.IABC, "GETTABUP"),
-        new OpCodeInfo(0, 1, OpArgType.OpArgR, OpArgType.OpArgK, OpFormat.IABC, "GETTABLE"),
-        new OpCodeInfo(0, 0, OpArgType.OpArgK, OpArgType.OpArgK, OpFormat.IABC, "SETTABUP"),
-        new OpCodeInfo(0, 0, OpArgType.OpArgU, OpArgType.OpArgN, OpFormat.IABC, "SETUPVAL"),
-        new OpCodeInfo(0, 0, OpArgType.OpArgK, OpArgType.OpArgK, OpFormat.IABC, "SETTABLE"),
-        new OpCodeInfo(0, 1, OpArgType.OpArgU, OpArgType.OpArgU, OpFormat.IABC, "NEWTABLE"),
-        new OpCodeInfo(0, 1, OpArgType.OpArgR, OpArgType.OpArgK, OpFormat.IABC, "SELF    "),
-        new OpCodeInfo(0, 1, OpArgType.OpArgK, OpArgType.OpArgK, OpFormat.IABC, "ADD     "),
-        new OpCodeInfo(0, 1, OpArgType.OpArgK, OpArgType.OpArgK, OpFormat.IABC, "SUB     "),
-        new OpCodeInfo(0, 1, OpArgType.OpArgK, OpArgType.OpArgK, OpFormat.IABC, "MUL     "),
-        new OpCodeInfo(0, 1, OpArgType.OpArgK, OpArgType.OpArgK, OpFormat.IABC, "MOD     "),
-        new OpCodeInfo(0, 1, OpArgType.OpArgK, OpArgType.OpArgK, OpFormat.IABC, "POW     "),
-        new OpCodeInfo(0, 1, OpArgType.OpArgK, OpArgType.OpArgK, OpFormat.IABC, "DIV     "),
-        new OpCodeInfo(0, 1, OpArgType.OpArgK, OpArgType.OpArgK, OpFormat.IABC, "IDIV    "),
-        new OpCodeInfo(0, 1, OpArgType.OpArgK, OpArgType.OpArgK, OpFormat.IABC, "BAND    "),
-        new OpCodeInfo(0, 1, OpArgType.OpArgK, OpArgType.OpArgK, OpFormat.IABC, "BOR     "),
-        new OpCodeInfo(0, 1, OpArgType.OpArgK, OpArgType.OpArgK, OpFormat.IABC, "BXOR    "),
-        new OpCodeInfo(0, 1, OpArgType.OpArgK, OpArgType.OpArgK, OpFormat.IABC, "SHL     "),
-        new OpCodeInfo(0, 1, OpArgType.OpArgK, OpArgType.OpArgK, OpFormat.IABC, "SHR     "),
+        new OpCodeInfo(0, 1, OpArgType.OpArgR, OpArgType.OpArgN, OpFormat.IABC, "MOVE    ", VM.Move),
+        new OpCodeInfo(0, 1, OpArgType.OpArgK, OpArgType.OpArgN, OpFormat.IABx, "LOADK   ", VM.LoadK),
+        new OpCodeInfo(0, 1, OpArgType.OpArgN, OpArgType.OpArgN, OpFormat.IABx, "LOADKX  ", VM.LoadKx),
+        new OpCodeInfo(0, 1, OpArgType.OpArgU, OpArgType.OpArgU, OpFormat.IABC, "LOADBOOL", VM.LoadBool),
+        new OpCodeInfo(0, 1, OpArgType.OpArgU, OpArgType.OpArgN, OpFormat.IABC, "LOADNIL ", VM.LoadNil),
+        new OpCodeInfo(0, 1, OpArgType.OpArgU, OpArgType.OpArgN, OpFormat.IABC, "GETUPVAL", null),
+        new OpCodeInfo(0, 1, OpArgType.OpArgU, OpArgType.OpArgK, OpFormat.IABC, "GETTABUP", null),
+        new OpCodeInfo(0, 1, OpArgType.OpArgR, OpArgType.OpArgK, OpFormat.IABC, "GETTABLE", null),
+        new OpCodeInfo(0, 0, OpArgType.OpArgK, OpArgType.OpArgK, OpFormat.IABC, "SETTABUP", null),
+        new OpCodeInfo(0, 0, OpArgType.OpArgU, OpArgType.OpArgN, OpFormat.IABC, "SETUPVAL", null),
+        new OpCodeInfo(0, 0, OpArgType.OpArgK, OpArgType.OpArgK, OpFormat.IABC, "SETTABLE", null),
+        new OpCodeInfo(0, 1, OpArgType.OpArgU, OpArgType.OpArgU, OpFormat.IABC, "NEWTABLE", null),
+        new OpCodeInfo(0, 1, OpArgType.OpArgR, OpArgType.OpArgK, OpFormat.IABC, "SELF    ", null),
+        new OpCodeInfo(0, 1, OpArgType.OpArgK, OpArgType.OpArgK, OpFormat.IABC, "ADD     ", VM.Add),
+        new OpCodeInfo(0, 1, OpArgType.OpArgK, OpArgType.OpArgK, OpFormat.IABC, "SUB     ", VM.Sub),
+        new OpCodeInfo(0, 1, OpArgType.OpArgK, OpArgType.OpArgK, OpFormat.IABC, "MUL     ", VM.Mul),
+        new OpCodeInfo(0, 1, OpArgType.OpArgK, OpArgType.OpArgK, OpFormat.IABC, "MOD     ", VM.Mod),
+        new OpCodeInfo(0, 1, OpArgType.OpArgK, OpArgType.OpArgK, OpFormat.IABC, "POW     ", VM.Pow),
+        new OpCodeInfo(0, 1, OpArgType.OpArgK, OpArgType.OpArgK, OpFormat.IABC, "DIV     ", VM.Div),
+        new OpCodeInfo(0, 1, OpArgType.OpArgK, OpArgType.OpArgK, OpFormat.IABC, "IDIV    ", VM.Idiv),
+        new OpCodeInfo(0, 1, OpArgType.OpArgK, OpArgType.OpArgK, OpFormat.IABC, "BAND    ", VM.Band),
+        new OpCodeInfo(0, 1, OpArgType.OpArgK, OpArgType.OpArgK, OpFormat.IABC, "BOR     ", VM.Bor),
+        new OpCodeInfo(0, 1, OpArgType.OpArgK, OpArgType.OpArgK, OpFormat.IABC, "BXOR    ", VM.Bxor),
+        new OpCodeInfo(0, 1, OpArgType.OpArgK, OpArgType.OpArgK, OpFormat.IABC, "SHL     ", VM.Shl),
+        new OpCodeInfo(0, 1, OpArgType.OpArgK, OpArgType.OpArgK, OpFormat.IABC, "SHR     ", VM.Shr),
 
-        new OpCodeInfo(0, 1, OpArgType.OpArgR, OpArgType.OpArgN, OpFormat.IABC, "UNM     "),
-        new OpCodeInfo(0, 1, OpArgType.OpArgR, OpArgType.OpArgN, OpFormat.IABC, "BNOT    "),
-        new OpCodeInfo(0, 1, OpArgType.OpArgR, OpArgType.OpArgN, OpFormat.IABC, "NOT     "),
-        new OpCodeInfo(0, 1, OpArgType.OpArgR, OpArgType.OpArgN, OpFormat.IABC, "LEN     "),
-        new OpCodeInfo(0, 1, OpArgType.OpArgR, OpArgType.OpArgR, OpFormat.IABC, "CONCAT  "),
+        new OpCodeInfo(0, 1, OpArgType.OpArgR, OpArgType.OpArgN, OpFormat.IABC, "UNM     ", VM.Unm),
+        new OpCodeInfo(0, 1, OpArgType.OpArgR, OpArgType.OpArgN, OpFormat.IABC, "BNOT    ", VM.Bnot),
+        new OpCodeInfo(0, 1, OpArgType.OpArgR, OpArgType.OpArgN, OpFormat.IABC, "NOT     ", VM.Not),
+        new OpCodeInfo(0, 1, OpArgType.OpArgR, OpArgType.OpArgN, OpFormat.IABC, "LEN     ", VM.Len),
+        new OpCodeInfo(0, 1, OpArgType.OpArgR, OpArgType.OpArgR, OpFormat.IABC, "CONCAT  ", VM.Concat),
 
-        new OpCodeInfo(0, 0, OpArgType.OpArgR, OpArgType.OpArgN, OpFormat.IAsBx, "JMP     "),
+        new OpCodeInfo(0, 0, OpArgType.OpArgR, OpArgType.OpArgN, OpFormat.IAsBx, "JMP     ", VM.Jmp),
 
-        new OpCodeInfo(1, 0, OpArgType.OpArgK, OpArgType.OpArgK, OpFormat.IABC, "EQ      "),
-        new OpCodeInfo(1, 0, OpArgType.OpArgK, OpArgType.OpArgK, OpFormat.IABC, "LT      "),
-        new OpCodeInfo(1, 0, OpArgType.OpArgK, OpArgType.OpArgK, OpFormat.IABC, "LE      "),
-        new OpCodeInfo(1, 0, OpArgType.OpArgN, OpArgType.OpArgU, OpFormat.IABC, "TEST    "),
-        new OpCodeInfo(1, 1, OpArgType.OpArgR, OpArgType.OpArgU, OpFormat.IABC, "TESTSET "),
-        new OpCodeInfo(0, 1, OpArgType.OpArgU, OpArgType.OpArgU, OpFormat.IABC, "CALL    "),
-        new OpCodeInfo(0, 1, OpArgType.OpArgU, OpArgType.OpArgU, OpFormat.IABC, "TAILCALL"),
+        new OpCodeInfo(1, 0, OpArgType.OpArgK, OpArgType.OpArgK, OpFormat.IABC, "EQ      ", VM.Eq),
+        new OpCodeInfo(1, 0, OpArgType.OpArgK, OpArgType.OpArgK, OpFormat.IABC, "LT      ", VM.Lt),
+        new OpCodeInfo(1, 0, OpArgType.OpArgK, OpArgType.OpArgK, OpFormat.IABC, "LE      ", VM.Le),
+        new OpCodeInfo(1, 0, OpArgType.OpArgN, OpArgType.OpArgU, OpFormat.IABC, "TEST    ", VM.Test),
+        new OpCodeInfo(1, 1, OpArgType.OpArgR, OpArgType.OpArgU, OpFormat.IABC, "TESTSET ", VM.TestSet),
+        new OpCodeInfo(0, 1, OpArgType.OpArgU, OpArgType.OpArgU, OpFormat.IABC, "CALL    ", null),
+        new OpCodeInfo(0, 1, OpArgType.OpArgU, OpArgType.OpArgU, OpFormat.IABC, "TAILCALL", null),
 
-        new OpCodeInfo(0, 0, OpArgType.OpArgU, OpArgType.OpArgN, OpFormat.IABC, "RETURN  "),
-        new OpCodeInfo(0, 1, OpArgType.OpArgR, OpArgType.OpArgN, OpFormat.IAsBx, "FORLOOP "),
-        new OpCodeInfo(0, 1, OpArgType.OpArgR, OpArgType.OpArgN, OpFormat.IAsBx, "FORPREP "),
-        new OpCodeInfo(0, 0, OpArgType.OpArgN, OpArgType.OpArgU, OpFormat.IABC, "TFORCALL"),
-        new OpCodeInfo(0, 1, OpArgType.OpArgR, OpArgType.OpArgN, OpFormat.IAsBx, "TFORLOOP"),
-        new OpCodeInfo(0, 0, OpArgType.OpArgU, OpArgType.OpArgU, OpFormat.IABC, "SETLIST "),
-        new OpCodeInfo(0, 1, OpArgType.OpArgU, OpArgType.OpArgN, OpFormat.IABx, "CLOSURE "),
-        new OpCodeInfo(0, 1, OpArgType.OpArgU, OpArgType.OpArgN, OpFormat.IABC, "VARARG  "),
-        new OpCodeInfo(0, 0, OpArgType.OpArgU, OpArgType.OpArgU, OpFormat.IAx, "EXTRAARG"),
+        new OpCodeInfo(0, 0, OpArgType.OpArgU, OpArgType.OpArgN, OpFormat.IABC, "RETURN  ", null),
+        new OpCodeInfo(0, 1, OpArgType.OpArgR, OpArgType.OpArgN, OpFormat.IAsBx, "FORLOOP ", VM.ForLoop),
+        new OpCodeInfo(0, 1, OpArgType.OpArgR, OpArgType.OpArgN, OpFormat.IAsBx, "FORPREP ", VM.ForPrep),
+        new OpCodeInfo(0, 0, OpArgType.OpArgN, OpArgType.OpArgU, OpFormat.IABC, "TFORCALL", null),
+        new OpCodeInfo(0, 1, OpArgType.OpArgR, OpArgType.OpArgN, OpFormat.IAsBx, "TFORLOOP", null),
+        new OpCodeInfo(0, 0, OpArgType.OpArgU, OpArgType.OpArgU, OpFormat.IABC, "SETLIST ", null),
+        new OpCodeInfo(0, 1, OpArgType.OpArgU, OpArgType.OpArgN, OpFormat.IABx, "CLOSURE ", null),
+        new OpCodeInfo(0, 1, OpArgType.OpArgU, OpArgType.OpArgN, OpFormat.IABC, "VARARG  ", null),
+        new OpCodeInfo(0, 0, OpArgType.OpArgU, OpArgType.OpArgU, OpFormat.IAx, "EXTRAARG", null),
     };
 }

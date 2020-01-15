@@ -6,6 +6,11 @@ internal struct LuaValue
 {
     public object Value;
 
+    public static implicit operator LuaValue(Int64 obj) => new LuaValue(obj);
+    public static implicit operator LuaValue(double obj) => new LuaValue(obj);
+    public static implicit operator LuaValue(string obj) => new LuaValue(obj);
+    public static implicit operator LuaValue(bool obj) => new LuaValue(obj);
+
     public LuaValue(object obj)
     {
         Value = obj;

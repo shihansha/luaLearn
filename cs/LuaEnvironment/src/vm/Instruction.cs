@@ -51,4 +51,16 @@ internal class Instruction
     public OpArgType BMode => OpCodeInfo.OpCodeInfos[Opcode].ArgBMode;
     public OpArgType CMode => OpCodeInfo.OpCodeInfos[Opcode].ArgCMode;
 
+    public void Execute(ILuaVM vm)
+    {
+        var action = OpCodeInfo.OpCodeInfos[Opcode].Action;
+        if (action != null)
+        {
+            action.Invoke(this, vm);
+        }
+        else
+        {
+            throw new Exception("not implemented op: " + OpName);
+        }
+    }
 }
