@@ -1,12 +1,16 @@
 using System;
 using System.Collections.Generic;
 
-internal class LuaStack
+public class LuaStack
 {
-    private List<LuaValue> slots;
-    private int top;
+    private readonly List<LuaValue> slots;
 
-    public int Top => top;
+    public int Top { get; set; }
+
+    public LuaStack Prev;
+    public LuaClosure Closure;
+    public List<LuaValue> Varargs;
+    public int PC;
 
     public LuaStack(int size)
     {
@@ -15,12 +19,12 @@ internal class LuaStack
         {
             slots.Add(new LuaValue(null));
         }
-        top = 0;
+        Top = 0;
     }
 
     public void Check(int n)
     {
-        int free = slots.Count - top;
+        int free = slots.Count - Top;
         for (int i = free; i < n; i++)
         {
             slots.Add(new LuaValue(null));
@@ -29,23 +33,23 @@ internal class LuaStack
 
     public void Push(LuaValue val)
     {
-        if (top == slots.Count)
+        if (Top == slots.Count)
         {
             throw new Exception("stack overflow!");
         }
 
-        slots[top++] = val;
+        slots[Top++] = val;
     }
 
     public LuaValue Pop()
     {
-        if (top < 1)
+        if (Top < 1)
         {
             throw new Exception("stack underflow!");
         }
-        top--;
-        LuaValue val = slots[top];
-        slots[top] = new LuaValue(null);
+        Top--;
+        LuaValue val = slots[Top];
+        slots[Top] = new LuaValue(null);
         return val;
     }
 
@@ -56,13 +60,13 @@ internal class LuaStack
             return idx;
         }
 
-        return idx + top + 1;
+        return idx + Top + 1;
     }
 
     public bool IsValid(int idx)
     {
         int absIdx = AbsIndex(idx);
-        return absIdx > 0 && absIdx <= top;
+        return absIdx > 0 && absIdx <= Top;
     }
 
     public void Set(int idx, LuaValue val)
@@ -74,6 +78,36 @@ internal class LuaStack
             return;
         }
         throw new Exception("invalid index!");
+    }
+
+    internal void PushN(LuaValue[] vals, int n)
+    {
+        var nVals = vals.Length;
+        if (n < 0)
+        {
+            n = nVals;
+        }
+        for (int i = 0; i < n; i++)
+        {
+            if (i < nVals)
+            {
+                Push(vals[i]);
+            }
+            else
+            {
+                Push(new LuaValue(null));
+            }
+        }
+    }
+
+    internal LuaValue[] PopN(int n)
+    {
+        var vals = new LuaValue[n];
+        for (int i = n - 1; i >= 0; i--)
+        {
+            vals[i] = Pop();
+        }
+        return vals;
     }
 
     public LuaValue Get(int idx)

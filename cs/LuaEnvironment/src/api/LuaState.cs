@@ -3,17 +3,23 @@ using System.Collections.Generic;
 
 public partial class LuaState : ILuaVM
 {
-    private const int DEFAULT_STACK_SIZE = 20;
+    private LuaStack stack;
 
-    private readonly LuaStack stack;
-
-    private readonly Prototype proto;
-    private int pc;
-
-    public LuaState(int stackSize, Prototype proto)
+    public LuaState()
     {
-        stack = new LuaStack(stackSize);
-        this.proto = proto;
-        pc = 0;
+        stack = new LuaStack(20);
+    }
+
+    public void PushLuaStack(LuaStack stack)
+    {
+        stack.Prev = stack;
+        this.stack = stack;
+    }
+
+    public void PopLuaStack()
+    {
+        var stack = this.stack;
+        this.stack = stack.Prev;
+        stack.Prev = null;
     }
 }

@@ -2,7 +2,7 @@
   "profiles": {
     "LuaEnvironment": {
       "commandName": "Project",
-      "commandLineArgs": "\"lua/ch06/luac.out\"",
+      "commandLineArgs": "\"lua/ch08/luac.out\"",
       "workingDirectory": "C:\\Users\\SSG\\Desktop\\luaLearn"
     }
   }

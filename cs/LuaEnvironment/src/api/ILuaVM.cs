@@ -7,4 +7,7 @@ public interface ILuaVM : ILuaState
     UInt32 Fetch(); // 取出当前指令; 将PC指向下一条指令
     void GetConst(int idx); // 将指定常量压入栈顶
     void GetRK(int rk); // 将指定常量或栈值压入栈顶
+    int RegisterCount();
+    void LoadVararg(int n);
+    void LoadProto(int bx);
 }

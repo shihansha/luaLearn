@@ -10,6 +10,10 @@ public partial class LuaState
         {
             stack.Push(new LuaValue((Int64)s.Length));
         }
+        else if (val.Value is LuaTable t)
+        {
+            stack.Push(t.Len);
+        }
         else
         {
             throw new Exception("lengh error!");

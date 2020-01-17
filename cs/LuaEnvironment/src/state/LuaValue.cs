@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 
 // LuaValue should never be null
-internal struct LuaValue
+public struct LuaValue
 {
     public object Value;
 
@@ -10,6 +10,8 @@ internal struct LuaValue
     public static implicit operator LuaValue(double obj) => new LuaValue(obj);
     public static implicit operator LuaValue(string obj) => new LuaValue(obj);
     public static implicit operator LuaValue(bool obj) => new LuaValue(obj);
+    public static implicit operator LuaValue(LuaTable obj) => new LuaValue(obj);
+    public static implicit operator LuaValue(LuaClosure obj) => new LuaValue(obj);
 
     public LuaValue(object obj)
     {
@@ -23,6 +25,8 @@ internal struct LuaValue
         Int64 _ => LuaType.Number,
         double _ => LuaType.Number,
         string _ => LuaType.String,
+        LuaTable _ => LuaType.Table,
+        LuaClosure _ => LuaType.Function,
         _ => throw new Exception($"Type {val.GetType()} is not a lua type!")
     };
 
@@ -44,7 +48,7 @@ internal struct LuaValue
             _ => (0, false)
         };
 
-        (Int64, bool) StringToInteger(string str)
+        static (Int64, bool) StringToInteger(string str)
         {
             var (i, ok) = Number.ParseInteger(str);
             if (ok) return (i, true);
@@ -52,5 +56,25 @@ internal struct LuaValue
             if (ok2) return Number.FloatToInteger(n);
             return (0, false);
         }
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(Value);
+    }
+
+    public override bool Equals(object obj)
+    {
+        return Value.Equals(((LuaValue)obj).Value);
+    }
+
+    public static bool operator ==(LuaValue left, LuaValue right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(LuaValue left, LuaValue right)
+    {
+        return !(left == right);
     }
 }

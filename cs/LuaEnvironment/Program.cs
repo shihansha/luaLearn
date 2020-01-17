@@ -53,35 +53,45 @@ namespace LuaEnvironment
             // PrintStack(ls);
 
             //// ch6 debug
+            //if (args.Length >= 1)
+            //{
+            //    var data = File.ReadAllBytes(args[0]);
+            //    Console.WriteLine("data length: " + data.Length);
+            //    Prototype proto = Prototype.Undump(data);
+            //    LuaMain(proto);
+            //}
+
+            //// ch8 debug
             if (args.Length >= 1)
             {
                 var data = File.ReadAllBytes(args[0]);
                 Console.WriteLine("data length: " + data.Length);
-                Prototype proto = Prototype.Undump(data);
-                LuaMain(proto);
+                var ls = new LuaState();
+                ls.Load(data, args[0], "b");
+                ls.Call(0, 0);
             }
         }
 
-        private static void LuaMain(Prototype proto)
-        {
-            var nRegs = (int)proto.MaxStackSize;
-            var ls = new LuaState(nRegs + 8, proto);
-            ls.SetTop(nRegs);
-            while (true)
-            {
-                var pc = ls.PC;
-                var inst = new Instruction(ls.Fetch());
-                if (inst.Opcode != (int)Opcodes.OP_RETURN)
-                {
-                    inst.Execute(ls);
-                    Console.Write($"[{pc + 1:D2}] {inst.OpName}");
-                    PrintStack(ls);
-                }
-                else
-                {
-                    break;
-                }
-            }
-        }
+        //private static void LuaMain(Prototype proto)
+        //{
+        //    var nRegs = (int)proto.MaxStackSize;
+        //    var ls = new LuaState(nRegs + 8, proto);
+        //    ls.SetTop(nRegs);
+        //    while (true)
+        //    {
+        //        var pc = ls.PC;
+        //        var inst = new Instruction(ls.Fetch());
+        //        if (inst.Opcode != (int)Opcodes.OP_RETURN)
+        //        {
+        //            inst.Execute(ls);
+        //            Console.Write($"[{pc + 1:D2}] {inst.OpName}");
+        //            PrintStack(ls);
+        //        }
+        //        else
+        //        {
+        //            break;
+        //        }
+        //    }
+        //}
     }
 }
