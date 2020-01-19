@@ -12,7 +12,7 @@ public partial class LuaState : ILuaVM
 
     public void PushLuaStack(LuaStack stack)
     {
-        stack.Prev = stack;
+        stack.Prev = this.stack;
         this.stack = stack;
     }
 

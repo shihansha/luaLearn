@@ -124,7 +124,7 @@ internal static partial class VM
     {
         var (a, b, c) = i.ABC();
         a += 1;
-        c += 1;
+        b += 1;
 
         vm.Copy(b, a + 1);
         vm.GetRK(c);

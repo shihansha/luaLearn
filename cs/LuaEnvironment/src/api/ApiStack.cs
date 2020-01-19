@@ -38,7 +38,7 @@ public partial class LuaState
     public void Replace(int idx)
     {
         var val = stack.Pop();
-        stack[idx] = val;
+        stack.Set(idx, val);
     }
 
     public void Insert(int idx)

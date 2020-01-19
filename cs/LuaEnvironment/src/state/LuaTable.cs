@@ -25,6 +25,10 @@ public class LuaTable
         {
             Map = new Dictionary<LuaValue, LuaValue>(nRec);
         }
+        else
+        {
+            Map = new Dictionary<LuaValue, LuaValue>();
+        }
     }
 
     public LuaValue Get(LuaValue key)

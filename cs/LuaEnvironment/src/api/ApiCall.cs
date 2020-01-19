@@ -40,10 +40,10 @@ public partial class LuaState
 
         LuaValue[] funcAndArgs = stack.PopN(nArgs + 1);
         newStack.PushN(funcAndArgs[1..], nParams);
-        newStack.Top = nArgs;
+        newStack.Top = nRegs;
         if (nArgs > nParams && isVararg)
         {
-            newStack.Varargs = funcAndArgs[nParams..].ToList();
+            newStack.Varargs = funcAndArgs[(nParams + 1)..].ToList();
         }
 
         PushLuaStack(newStack);
@@ -63,6 +63,7 @@ public partial class LuaState
         while (true)
         {
             Instruction inst = Fetch();
+            // Console.WriteLine(OpCodeInfo.OpCodeInfos[inst.Opcode].Name);
             inst.Execute(this);
             if ((Opcodes)inst.Opcode == Opcodes.OP_RETURN)
             {

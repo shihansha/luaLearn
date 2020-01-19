@@ -77,4 +77,9 @@ public struct LuaValue
     {
         return !(left == right);
     }
+
+    public override string ToString()
+    {
+        return Value.ToString();
+    }
 }

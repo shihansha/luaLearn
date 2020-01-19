@@ -72,7 +72,7 @@ public class LuaStack
     public void Set(int idx, LuaValue val)
     {
         int absIdx = AbsIndex(idx);
-        if (IsValid(absIdx))
+        if (absIdx > 0 && absIdx <= Top)
         {
             slots[absIdx - 1] = val;
             return;
@@ -113,7 +113,7 @@ public class LuaStack
     public LuaValue Get(int idx)
     {
         int absIdx = AbsIndex(idx);
-        if (IsValid(absIdx))
+        if (absIdx > 0 && absIdx <= Top)
         {
             return slots[absIdx - 1];
         }
