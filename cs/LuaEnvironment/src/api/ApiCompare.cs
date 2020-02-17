@@ -5,8 +5,8 @@ public partial class LuaState
 {
     public bool Compare(int idx1, int idx2, CompareOp op)
     {
-        var a = stack.Get(idx1);
-        var b = stack.Get(idx2);
+        var a = LuaStack.Get(idx1);
+        var b = LuaStack.Get(idx2);
         return op switch
         {
             CompareOp.Eq => Eq(a, b),

@@ -6,9 +6,9 @@ public partial class LuaState
 {
     public void SetTable(int idx)
     {
-        var t = stack.Get(idx);
-        var v = stack.Pop();
-        var k = stack.Pop();
+        var t = LuaStack.Get(idx);
+        var v = LuaStack.Pop();
+        var k = LuaStack.Pop();
         SetTable(t, k, v);
     }
 
@@ -25,15 +25,28 @@ public partial class LuaState
 
     public void SetField(int idx, string k)
     {
-        var t = stack.Get(idx);
-        var v = stack.Pop();
+        var t = LuaStack.Get(idx);
+        var v = LuaStack.Pop();
         SetTable(t, k, v);
     }
 
     public void SetI(int idx, Int64 i)
     {
-        var t = stack.Get(idx);
-        var v = stack.Pop();
+        var t = LuaStack.Get(idx);
+        var v = LuaStack.Pop();
         SetTable(t, i, v);
+    }
+
+    public void SetGlobal(string name)
+    {
+        var t = Registry.Get(Consts.LUA_RIDX_GLOBALS);
+        var v = LuaStack.Pop();
+        SetTable(t, name, v);
+    }
+
+    public void Register(string name, CSharpFunction cs)
+    {
+        PushCSharpFunction(cs);
+        SetGlobal(name);
     }
 }

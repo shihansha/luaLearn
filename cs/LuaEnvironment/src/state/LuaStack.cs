@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 public class LuaStack
 {
+    private readonly LuaState state;
     private readonly List<LuaValue> slots;
 
     public int Top { get; set; }
@@ -11,8 +12,11 @@ public class LuaStack
     public LuaClosure Closure;
     public List<LuaValue> Varargs;
     public int PC;
+    public Dictionary<int, LuaUpValue> Openuvs;
 
-    public LuaStack(int size)
+    public List<LuaValue> Slots { get => slots; }
+
+    public LuaStack(int size, LuaState state)
     {
         slots = new List<LuaValue>(size);
         for (int i = 0; i < size; i++)
@@ -20,6 +24,7 @@ public class LuaStack
             slots.Add(new LuaValue(null));
         }
         Top = 0;
+        this.state = state;
     }
 
     public void Check(int n)
@@ -55,6 +60,11 @@ public class LuaStack
 
     public int AbsIndex(int idx)
     {
+        if (idx <= Consts.LUA_REGISTRYINDEX)
+        {
+            return idx;
+        }
+
         if (idx >= 0)
         {
             return idx;
@@ -65,12 +75,40 @@ public class LuaStack
 
     public bool IsValid(int idx)
     {
+        if (idx < Consts.LUA_REGISTRYINDEX)
+        {
+            int uvIdx = Consts.LUA_REGISTRYINDEX - idx - 1;
+            var c = Closure;
+            return c != null && uvIdx < (c.Upvals?.Length ?? 0);
+        }
+        if (idx == Consts.LUA_REGISTRYINDEX)
+        {
+            return true;
+        }
+
         int absIdx = AbsIndex(idx);
         return absIdx > 0 && absIdx <= Top;
     }
 
     public void Set(int idx, LuaValue val)
     {
+        if (idx < Consts.LUA_REGISTRYINDEX)
+        {
+            int uvIdx = Consts.LUA_REGISTRYINDEX - idx - 1;
+            var c = Closure;
+            if (c != null && uvIdx < (c.Upvals?.Length ?? 0))
+            {
+                c.Upvals[uvIdx].Value = val;
+            }
+            return;
+        }
+
+        if (idx == Consts.LUA_REGISTRYINDEX)
+        {
+            state.Registry = val.Value as LuaTable;
+            return;
+        }
+
         int absIdx = AbsIndex(idx);
         if (absIdx > 0 && absIdx <= Top)
         {
@@ -112,6 +150,22 @@ public class LuaStack
 
     public LuaValue Get(int idx)
     {
+        if (idx < Consts.LUA_REGISTRYINDEX)
+        {
+            int uvIdx = Consts.LUA_REGISTRYINDEX - idx - 1;
+            var c = Closure;
+            if (c == null || uvIdx >= (c.Upvals?.Length ?? 0))
+            {
+                return new LuaValue(null);
+            }
+            return c.Upvals[uvIdx].Value;
+        }
+
+        if (idx == Consts.LUA_REGISTRYINDEX)
+        {
+            return state.Registry;
+        }
+
         int absIdx = AbsIndex(idx);
         if (absIdx > 0 && absIdx <= Top)
         {

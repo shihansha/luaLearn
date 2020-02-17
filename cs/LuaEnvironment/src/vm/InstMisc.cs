@@ -17,7 +17,7 @@ internal static partial class VM
         vm.AddPC(sbx);
         if (a != 0)
         {
-            throw new Exception("todo");
+            vm.CloseUpvalues(a);
         }
     }
 }

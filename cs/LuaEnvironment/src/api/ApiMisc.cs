@@ -5,14 +5,14 @@ public partial class LuaState
 {
     public void Len(int idx)
     {
-        var val = stack.Get(idx);
+        var val = LuaStack.Get(idx);
         if (val.Value is string s)
         {
-            stack.Push(new LuaValue((Int64)s.Length));
+            LuaStack.Push(new LuaValue((Int64)s.Length));
         }
         else if (val.Value is LuaTable t)
         {
-            stack.Push(t.Len);
+            LuaStack.Push(t.Len);
         }
         else
         {
@@ -24,7 +24,7 @@ public partial class LuaState
     {
         if (n == 0)
         {
-            stack.Push(new LuaValue(string.Empty));
+            LuaStack.Push(new LuaValue(string.Empty));
         }
         else if (n >= 2)
         {
@@ -34,9 +34,9 @@ public partial class LuaState
                 {
                     string s2 = ToString(-1);
                     string s1 = ToString(-2);
-                    stack.Pop();
-                    stack.Pop();
-                    stack.Push(new LuaValue(s1 + s2));
+                    LuaStack.Pop();
+                    LuaStack.Pop();
+                    LuaStack.Push(new LuaValue(s1 + s2));
                     continue;
                 }
                 throw new Exception("concatenation error!");

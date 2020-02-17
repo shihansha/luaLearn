@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 
+public delegate int CSharpFunction(ILuaState luaState);
+
 public interface ILuaState
 {
     // basic stack manipulation
@@ -57,4 +59,18 @@ public interface ILuaState
     // exec
     int Load(byte[] chunk, string chunkName, string mode);
     void Call(int nArgs, int nResults);
+    // csharp func call
+    void PushCSharpFunction(CSharpFunction cs);
+    bool IsCSharpFunction(int idx);
+    CSharpFunction ToCSharpFunction(int idx);
+
+    LuaTable Registry { get; }
+    LuaStack LuaStack { get; }
+
+    void PushGlobalTable();
+    LuaType GetGlobal(string name);
+    void SetGlobal(string name);
+    void Register(string name, CSharpFunction cs);
+
+    void PushCSharpClosure(CSharpFunction f, int n);
 }

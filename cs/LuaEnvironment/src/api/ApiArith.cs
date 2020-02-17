@@ -6,11 +6,11 @@ public partial class LuaState
     public void Arith(ArithOp op)
     {
         LuaValue a, b;
-        b = stack.Pop();
+        b = LuaStack.Pop();
 
         if (op != ArithOp.Unm && op != ArithOp.Bnot)
         {
-            a = stack.Pop();
+            a = LuaStack.Pop();
         }
         else
         {
@@ -21,7 +21,7 @@ public partial class LuaState
         var result = ArithSub(a, b, aop);
         if (result.Value != null)
         {
-            stack.Push(result);
+            LuaStack.Push(result);
         }
         else
         {

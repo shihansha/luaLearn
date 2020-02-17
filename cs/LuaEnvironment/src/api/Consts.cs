@@ -38,3 +38,11 @@ public enum CompareOp
     Le, // <=
 }
 
+public static class Consts
+{
+    public const int LUA_MINSTACK = 20;
+    public const int LUAI_MAXSTACK = 1_000_000;
+    public const int LUA_REGISTRYINDEX = -LUAI_MAXSTACK - 1000;
+    public const long LUA_RIDX_GLOBALS = 2;
+}
+

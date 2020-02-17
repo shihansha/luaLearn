@@ -10,7 +10,7 @@ public partial class LuaState
 
     public bool IsInteger(int idx)
     {
-        var val = stack.Get(idx);
+        var val = LuaStack.Get(idx);
         return val.Value.GetType() == typeof(Int64);
     }
 
@@ -41,12 +41,22 @@ public partial class LuaState
         return t == LuaType.String || t == LuaType.Number;
     }
 
+    public bool IsCSharpFunction(int idx)
+    {
+        var val = LuaStack.Get(idx);
+        if (val.Value is LuaClosure lc)
+        {
+            return lc.CSharpFunc != null;
+        }
+        return false;
+    }
+
     public bool ToBoolean(int idx)
     {
-        var val = stack.Get(idx);
+        var val = LuaStack.Get(idx);
         return ConvertToBoolean(val);
 
-        bool ConvertToBoolean(LuaValue val) => val.Value switch
+        static bool ConvertToBoolean(LuaValue val) => val.Value switch
         {
             null => false,
             bool b => b,
@@ -62,7 +72,7 @@ public partial class LuaState
 
     public (long, bool) ToIntegerX(int idx)
     {
-        var val = stack.Get(idx);
+        var val = LuaStack.Get(idx);
         return val.ToInteger();
     }
 
@@ -74,7 +84,7 @@ public partial class LuaState
 
     public (double, bool) ToNumberX(int idx)
     {
-        var val = stack.Get(idx);
+        var val = LuaStack.Get(idx);
         return val.ToFloat();
     }
 
@@ -86,13 +96,13 @@ public partial class LuaState
 
     public (string, bool) ToStringX(int idx)
     {
-        var val = stack.Get(idx);
+        var val = LuaStack.Get(idx);
         switch (val.Value)
         {
             case string s: return (s, true);
             case object o when o is Int64 || o is double:
                 string os = o.ToString();
-                stack.Set(idx, new LuaValue(os));
+                LuaStack.Set(idx, new LuaValue(os));
                 return (os, true);
             default:
                 return (string.Empty, false);
@@ -101,12 +111,22 @@ public partial class LuaState
 
     public LuaType Type(int idx)
     {
-        if (stack.IsValid(idx))
+        if (LuaStack.IsValid(idx))
         {
-            var val = stack[idx];
+            var val = LuaStack[idx];
             return LuaValue.TypeOf(val);
         }
         return LuaType.None;
+    }
+
+    public CSharpFunction ToCSharpFunction(int idx)
+    {
+        var val = LuaStack.Get(idx);
+        if (val.Value is LuaClosure lc)
+        {
+            return lc.CSharpFunc;
+        }
+        return null;
     }
 
     public string TypeName(LuaType tp) => tp switch

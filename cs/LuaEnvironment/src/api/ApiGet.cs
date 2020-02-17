@@ -7,15 +7,15 @@ public partial class LuaState
     public void CreateTable(int nArr, int nRec)
     {
         var t = new LuaTable(nArr, nRec);
-        stack.Push(t);
+        LuaStack.Push(t);
     }
 
     public void NewTable() => CreateTable(0, 0);
 
     public LuaType GetTable(int idx)
     {
-        var t = stack.Get(idx);
-        var k = stack.Pop();
+        var t = LuaStack.Get(idx);
+        var k = LuaStack.Pop();
         return GetTable(t, k);
     }
 
@@ -24,7 +24,7 @@ public partial class LuaState
         if (t.Value is LuaTable tbl)
         {
             var v = tbl.Get(k);
-            stack.Push(v);
+            LuaStack.Push(v);
             return LuaValue.TypeOf(v);
         }
 
@@ -33,14 +33,20 @@ public partial class LuaState
 
     public LuaType GetField(int idx, string k)
     {
-        var t = stack.Get(idx);
+        var t = LuaStack.Get(idx);
         return GetTable(t, k);
     }
 
     public LuaType GetI(int idx, Int64 i)
     {
-        var t = stack.Get(idx);
+        var t = LuaStack.Get(idx);
         return GetTable(t, i);
+    }
+
+    public LuaType GetGlobal(string name)
+    {
+        var t = Registry.Get(Consts.LUA_RIDX_GLOBALS);
+        return GetTable(t, name);
     }
 }
 

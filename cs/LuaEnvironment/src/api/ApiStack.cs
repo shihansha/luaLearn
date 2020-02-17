@@ -4,17 +4,17 @@ public partial class LuaState
 {
     public int GetTop()
     {
-        return stack.Top;
+        return LuaStack.Top;
     }
 
     public int AbsIndex(int idx)
     {
-        return stack.AbsIndex(idx);
+        return LuaStack.AbsIndex(idx);
     }
 
     public bool CheckStack(int n)
     {
-        stack.Check(n);
+        LuaStack.Check(n);
         return true;
     }
 
@@ -25,20 +25,20 @@ public partial class LuaState
 
     public void Copy(int fromIdx, int toIdx)
     {
-        var val = stack[fromIdx];
-        stack[toIdx] = val;
+        var val = LuaStack[fromIdx];
+        LuaStack[toIdx] = val;
     }
 
     public void PushValue(int idx)
     {
-        var val = stack[idx];
-        stack.Push(val);
+        var val = LuaStack[idx];
+        LuaStack.Push(val);
     }
 
     public void Replace(int idx)
     {
-        var val = stack.Pop();
-        stack.Set(idx, val);
+        var val = LuaStack.Pop();
+        LuaStack.Set(idx, val);
     }
 
     public void Insert(int idx)
@@ -54,35 +54,35 @@ public partial class LuaState
 
     public void Rotate(int idx, int n)
     {
-        int t = stack.Top - 1;
-        int p = stack.AbsIndex(idx) - 1;
+        int t = LuaStack.Top - 1;
+        int p = LuaStack.AbsIndex(idx) - 1;
         int m = n >= 0 ? t - n : p - n - 1;
 
-        stack.Reverse(p, m);
-        stack.Reverse(m + 1, t);
-        stack.Reverse(p, t);
+        LuaStack.Reverse(p, m);
+        LuaStack.Reverse(m + 1, t);
+        LuaStack.Reverse(p, t);
     }
 
     public void SetTop(int idx)
     {
-        int newTop = stack.AbsIndex(idx);
+        int newTop = LuaStack.AbsIndex(idx);
         if (newTop < 0)
         {
             throw new Exception("stack underflow!");
         }
-        int n = stack.Top - newTop;
+        int n = LuaStack.Top - newTop;
         if (n > 0)
         {
             for (int i = 0; i < n; i++)
             {
-                stack.Pop();
+                LuaStack.Pop();
             }
         }
         else if (n < 0)
         {
             for (int i = 0; i > n; i--)
             {
-                stack.Push(new LuaValue(null));
+                LuaStack.Push(new LuaValue(null));
             }
         }
     }

@@ -10,4 +10,5 @@ public interface ILuaVM : ILuaState
     int RegisterCount();
     void LoadVararg(int n);
     void LoadProto(int bx);
+    void CloseUpvalues(int a);
 }
