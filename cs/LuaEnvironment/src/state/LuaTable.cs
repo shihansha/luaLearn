@@ -4,6 +4,7 @@ using System.Text;
 
 public class LuaTable
 {
+    public LuaTable Metatable;
     public List<LuaValue> Arr;
     public Dictionary<LuaValue, LuaValue> Map;
 
@@ -142,6 +143,11 @@ public class LuaTable
     {
         get => Get(key);
         set => Put(key, value);
+    }
+
+    public bool HasMetafield(string fieldName)
+    {
+        return Metatable?.Get(fieldName) != null;
     }
 }
 

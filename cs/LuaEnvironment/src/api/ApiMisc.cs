@@ -10,6 +10,10 @@ public partial class LuaState
         {
             LuaStack.Push(new LuaValue((Int64)s.Length));
         }
+        else if (LuaValue.TryCallMetamethod(val, val, "__len", this, out LuaValue result))
+        {
+            LuaStack.Push(result);
+        }
         else if (val.Value is LuaTable t)
         {
             LuaStack.Push(t.Len);
@@ -18,6 +22,21 @@ public partial class LuaState
         {
             throw new Exception("lengh error!");
         }
+    }
+
+    public uint RawLen(int idx)
+    {
+        var val = LuaStack.Get(idx);
+        if (val.Value is string s)
+        {
+            return (uint)s.Length;
+        }
+        else if (val.Value is LuaTable t)
+        {
+            return (uint)t.Len;
+        }
+
+        return 0;
     }
 
     public void Concat(int n)
@@ -39,6 +58,15 @@ public partial class LuaState
                     LuaStack.Push(new LuaValue(s1 + s2));
                     continue;
                 }
+                
+                var b = LuaStack.Pop();
+                var a = LuaStack.Pop();
+                if (LuaValue.TryCallMetamethod(a, b, "__concat", this, out LuaValue result))
+                {
+                    LuaStack.Push(result);
+                    continue;
+                }
+
                 throw new Exception("concatenation error!");
             }
         }

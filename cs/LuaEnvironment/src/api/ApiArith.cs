@@ -22,13 +22,19 @@ public partial class LuaState
         if (result.Value != null)
         {
             LuaStack.Push(result);
-        }
-        else
-        {
-            throw new Exception("arithmetic error!");
+            return;
         }
 
-        LuaValue ArithSub(LuaValue a, LuaValue b, Operator op)
+        string mm = aop.Metamethod;
+        if (LuaValue.TryCallMetamethod(a, b, mm, this, out LuaValue metaRes))
+        {
+            LuaStack.Push(metaRes);
+            return;
+        }
+
+        throw new Exception("arithmetic error!");
+
+        static LuaValue ArithSub(LuaValue a, LuaValue b, Operator op)
         {
             if (op.FloatFunc == null) // bitwise
             {

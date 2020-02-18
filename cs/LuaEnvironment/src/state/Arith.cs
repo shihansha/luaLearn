@@ -3,10 +3,12 @@ using System.Collections.Generic;
 
 internal class Operator
 {
+    public readonly string Metamethod;
     public readonly Func<Int64, Int64, Int64> IntegerFunc;
     public readonly Func<double, double, double> FloatFunc;
-    public Operator(Func<Int64, Int64, Int64> i, Func<double, double, double> d)
+    public Operator(string metamethod, Func<Int64, Int64, Int64> i, Func<double, double, double> d)
     {
+        Metamethod = metamethod;
         IntegerFunc = i;
         FloatFunc = d;
     }
@@ -37,19 +39,19 @@ internal static class Arith
 
     public static readonly Operator[] Operators = new Operator[]
     {
-        new Operator(Iadd, Fadd),
-        new Operator(Isub, Fsub),
-        new Operator(Imul, Fmul),
-        new Operator(Imod, Fmod),
-        new Operator(null, Pow),
-        new Operator(null, Div),
-        new Operator(Iidiv, Fidiv),
-        new Operator(Band, null),
-        new Operator(Bor, null),
-        new Operator(Bxor, null),
-        new Operator(Shl, null),
-        new Operator(Shr, null),
-        new Operator(Iunm, Funm),
-        new Operator(Bnot, null),
+        new Operator("__add", Iadd, Fadd),
+        new Operator("__sub", Isub, Fsub),
+        new Operator("__mul", Imul, Fmul),
+        new Operator("__mod", Imod, Fmod),
+        new Operator("__pow", null, Pow),
+        new Operator("__div", null, Div),
+        new Operator("__idiv", Iidiv, Fidiv),
+        new Operator("__band", Band, null),
+        new Operator("__bor", Bor, null),
+        new Operator("__bxor", Bxor, null),
+        new Operator("__shl", Shl, null),
+        new Operator("__shr", Shr, null),
+        new Operator("__unm", Iunm, Funm),
+        new Operator("__bnot", Bnot, null),
     };
 }

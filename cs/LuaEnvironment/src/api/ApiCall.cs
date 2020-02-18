@@ -21,15 +21,29 @@ public partial class LuaState
     public void Call(int nArgs, int nResults)
     {
         var val = LuaStack.Get(-(nArgs + 1));
-        if (val.Value is LuaClosure c)
+        var f = val.Value as LuaClosure;
+        if (f == null)
         {
-            if (c.Proto != null)
+            if (LuaValue.GetMetaField(val, "__call", this) is LuaValue mf)
             {
-                CallLuaClosure(nArgs, nResults, c);
+                if (mf.Value is LuaClosure c)
+                {
+                    LuaStack.Push(val);
+                    Insert(-(nArgs + 2));
+                    nArgs += 1;
+                    f = c;
+                }
+            }
+        }
+        if (f != null)
+        {
+            if (f.Proto != null)
+            {
+                CallLuaClosure(nArgs, nResults, f);
             }
             else
             {
-                CallCSharpClosure(nArgs, nResults, c);
+                CallCSharpClosure(nArgs, nResults, f);
             }
         }
         else
@@ -97,8 +111,8 @@ public partial class LuaState
         while (true)
         {
             Instruction inst = Fetch();
-            LuaDebugUtils.PrintStack(this);
-            Console.WriteLine(OpCodeInfo.OpCodeInfos[inst.Opcode].Name);
+            //LuaDebugUtils.PrintStack(this);
+            //Console.WriteLine(OpCodeInfo.OpCodeInfos[inst.Opcode].Name);
             inst.Execute(this);
             if ((Opcodes)inst.Opcode == Opcodes.OP_RETURN)
             {

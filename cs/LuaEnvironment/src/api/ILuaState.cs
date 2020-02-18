@@ -73,4 +73,16 @@ public interface ILuaState
     void Register(string name, CSharpFunction cs);
 
     void PushCSharpClosure(CSharpFunction f, int n);
+
+    bool GetMetatable(int idx);
+    void SetMetatable(int idx);
+    uint RawLen(int idx);
+    bool RawEqual(int idx1, int idx2);
+    LuaType RawGet(int idx);
+    void RawSet(int idx);
+    LuaType RawGetI(int idx, Int64 i);
+    void RawSetI(int idx, Int64 i);
+    LuaType RawGetGlobal(string name);
+    void RawSetGlobal(string name);
+
 }

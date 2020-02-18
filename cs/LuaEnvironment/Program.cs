@@ -15,6 +15,8 @@ namespace LuaEnvironment
                 var ls = new LuaState();
                 ProgramLuaState = ls;
                 ls.Register(nameof(Print).ToLower(), Print);
+                ls.Register(nameof(GetMetatable).ToLower(), GetMetatable);
+                ls.Register(nameof(SetMetatable).ToLower(), SetMetatable);
                 ls.Load(data, "chunk", "b");
                 ls.Call(0, 0);
             }
@@ -44,6 +46,21 @@ namespace LuaEnvironment
             }
             Console.WriteLine();
             return 0;
+        }
+
+        private static int GetMetatable(ILuaState ls)
+        {
+            if (!ls.GetMetatable(1))
+            {
+                ls.PushNil();
+            }
+            return 1;
+        }
+
+        private static int SetMetatable(ILuaState ls)
+        {
+            ls.SetMetatable(1);
+            return 1;
         }
     }
 }
