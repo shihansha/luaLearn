@@ -71,7 +71,7 @@ public partial class LuaState
                 }
                 else
                 {
-                    closure.Upvals[i] = new LuaUpValue() { Value = LuaStack.Slots[uvIdx] };
+                    closure.Upvals[i] = LuaUpValue.CreateOpen(LuaStack, uvIdx);
                     LuaStack.Openuvs[uvIdx] = closure.Upvals[i];
                 }
             }
@@ -84,7 +84,13 @@ public partial class LuaState
 
     public void CloseUpvalues(int a)
     {
-        LuaStack.Openuvs.Clear();
+        foreach (LuaUpValue val in LuaStack.Openuvs.Values)
+        {
+            if (val.IsOpen)
+            {
+                val.MakeClosed();
+            }
+        }
     }
 }
 

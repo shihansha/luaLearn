@@ -98,7 +98,7 @@ public class LuaStack
             var c = Closure;
             if (c != null && uvIdx < (c.Upvals?.Length ?? 0))
             {
-                c.Upvals[uvIdx].Value = val;
+                c.Upvals[uvIdx] = LuaUpValue.CreateClosed(val);
             }
             return;
         }

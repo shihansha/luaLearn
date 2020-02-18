@@ -19,7 +19,7 @@ public partial class LuaState
         for (int i = n - 1; i >= 0; i--)
         {
             var val = LuaStack.Pop();
-            closure.Upvals[i] = new LuaUpValue() { Value = val }; 
+            closure.Upvals[i] = LuaUpValue.CreateClosed(val); 
         }
         LuaStack.Push(closure);
     }

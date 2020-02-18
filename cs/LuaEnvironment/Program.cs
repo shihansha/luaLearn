@@ -4,14 +4,16 @@ using static LuaDebugUtils;
 
 namespace LuaEnvironment
 {
-    class Program
+    public class Program
     {
+        public static LuaState ProgramLuaState;
         static void Main(string[] args)
         {
             if (args.Length >= 1)
             {
                 var data = File.ReadAllBytes(args[0]);
                 var ls = new LuaState();
+                ProgramLuaState = ls;
                 ls.Register(nameof(Print).ToLower(), Print);
                 ls.Load(data, "chunk", "b");
                 ls.Call(0, 0);

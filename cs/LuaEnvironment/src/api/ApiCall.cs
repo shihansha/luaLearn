@@ -13,7 +13,7 @@ public partial class LuaState
         if (proto.UpValues != null && proto.UpValues.Length > 0)
         {
             var env = Registry.Get(Consts.LUA_RIDX_GLOBALS);
-            c.Upvals[0] = new LuaUpValue() { Value = env };
+            c.Upvals[0] = LuaUpValue.CreateClosed(env);
         }
         return 0;
     }
@@ -97,7 +97,8 @@ public partial class LuaState
         while (true)
         {
             Instruction inst = Fetch();
-            // Console.WriteLine(OpCodeInfo.OpCodeInfos[inst.Opcode].Name);
+            LuaDebugUtils.PrintStack(this);
+            Console.WriteLine(OpCodeInfo.OpCodeInfos[inst.Opcode].Name);
             inst.Execute(this);
             if ((Opcodes)inst.Opcode == Opcodes.OP_RETURN)
             {

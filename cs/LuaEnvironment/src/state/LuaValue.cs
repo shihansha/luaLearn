@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 
 // LuaValue should never be null
-public struct LuaValue
+public class LuaValue
 {
     public object Value;
 
