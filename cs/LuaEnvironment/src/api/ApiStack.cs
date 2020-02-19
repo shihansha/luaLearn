@@ -82,7 +82,7 @@ public partial class LuaState
         {
             for (int i = 0; i > n; i--)
             {
-                LuaStack.Push(new LuaValue(null));
+                LuaStack.Push(LuaValue.Nil);
             }
         }
     }

@@ -2,7 +2,7 @@ using System;
 
 public partial class LuaState
 {
-    public void PushNil() => LuaStack.Push(new LuaValue(null));
+    public void PushNil() => LuaStack.Push(LuaValue.Nil);
     public void PushBoolean(bool b) => LuaStack.Push(b);
     public void PushInteger(Int64 n) => LuaStack.Push(n);
     public void PushNumber(double n) => LuaStack.Push(n);

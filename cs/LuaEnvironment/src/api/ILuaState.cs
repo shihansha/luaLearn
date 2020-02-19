@@ -84,5 +84,5 @@ public interface ILuaState
     void RawSetI(int idx, Int64 i);
     LuaType RawGetGlobal(string name);
     void RawSetGlobal(string name);
-
+    bool Next(int idx);
 }

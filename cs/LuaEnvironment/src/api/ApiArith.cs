@@ -72,7 +72,7 @@ public partial class LuaState
                 }
             }
 
-            return new LuaValue(null);
+            return LuaValue.Nil;
         }
     }
 }

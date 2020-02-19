@@ -72,4 +72,22 @@ public partial class LuaState
         }
         // n == 1, do nothing
     }
+
+    public bool Next(int idx)
+    {
+        var val = LuaStack.Get(idx);
+        if (val.Value is LuaTable t)
+        {
+            var key = LuaStack.Pop();
+            var nextKey = t.NextKey(key);
+            if (nextKey.Value != null)
+            {
+                LuaStack.Push(nextKey);
+                LuaStack.Push(t.Get(nextKey));
+                return true;
+            }
+            return false;
+        }
+        throw new Exception("table expected!");
+    }
 }

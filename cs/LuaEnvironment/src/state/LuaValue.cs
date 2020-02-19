@@ -18,6 +18,8 @@ public class LuaValue
         Value = obj;
     }
 
+    public static LuaValue Nil { get; } = new LuaValue(null);
+
     public static LuaType TypeOf(LuaValue val) => val.Value switch
     {
         null => LuaType.Nil,
@@ -117,7 +119,7 @@ public class LuaValue
             mm = GetMetaField(b, mmName, ls);
             if (mm == null)
             {
-                result = new LuaValue(null);
+                result = LuaValue.Nil;
                 return false;
             }
         }

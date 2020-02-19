@@ -131,5 +131,27 @@ internal static partial class VM
         vm.GetTable(b);
         vm.Replace(a);
     }
+
+    internal static void TForCall(Instruction i, ILuaVM vm)
+    {
+        var (a, _, c) = i.ABC();
+        a += 1;
+
+        PushFuncAndArgs(a, 3, vm);
+        vm.Call(2, c);
+        PopResults(a + 3, c + 1, vm);
+    }
+
+    internal static void TForLoop(Instruction i, ILuaVM vm)
+    {
+        var (a, sBx) = i.AsBx();
+        a += 1;
+
+        if (!vm.IsNil(a + 1))
+        {
+            vm.Copy(a + 1, a);
+            vm.AddPC(sBx);
+        }
+    }
 }
 

@@ -7,6 +7,8 @@ public class LuaTable
     public LuaTable Metatable;
     public List<LuaValue> Arr;
     public Dictionary<LuaValue, LuaValue> Map;
+    public Dictionary<LuaValue, LuaValue> Keys;
+    private LuaValue lastKey;
 
     public LuaTable(int nArr, int nRec)
     {
@@ -15,7 +17,7 @@ public class LuaTable
             Arr = new List<LuaValue>(nArr);
             for (int i = 0; i < nArr; i++)
             {
-                Arr.Add(new LuaValue(null));
+                Arr.Add(LuaValue.Nil);
             }
         }
         else
@@ -44,7 +46,7 @@ public class LuaTable
             }
         }
 
-        return Map.GetValueOrDefault(key, defaultValue: new LuaValue(null));
+        return Map.GetValueOrDefault(key, defaultValue: LuaValue.Nil);
     }
 
     public void Put(LuaValue key, LuaValue val)
@@ -89,7 +91,7 @@ public class LuaTable
             {
                 Map = new Dictionary<LuaValue, LuaValue>(8);
             }
-            Map.Add(key, val);
+            Map[key] = val;
         }
         else
         {
@@ -148,6 +150,56 @@ public class LuaTable
     public bool HasMetafield(string fieldName)
     {
         return Metatable?.Get(fieldName) != null;
+    }
+
+    public LuaValue NextKey(LuaValue key)
+    {
+        if (Keys == null || key == null)
+        {
+            InitKeys();
+        }
+
+        Keys.TryGetValue(key ?? LuaValue.Nil, out LuaValue nextKey);
+        nextKey ??= LuaValue.Nil;
+
+        if (nextKey == null && key != null && key != lastKey)
+        {
+            throw new Exception("invalid key to 'next'");
+        }
+
+        return nextKey;
+    }
+
+    private void InitKeys()
+    {
+        Keys = new Dictionary<LuaValue, LuaValue>();
+        LuaValue key = LuaValue.Nil;
+        if (Arr != null)
+        {
+            for (int i = 0; i < Arr.Count; i++)
+            {
+                var v = Arr[i];
+                if (v.Value != null)
+                {
+                    Keys[key] = (Int64)(i + 1);
+                    key = (Int64)(i + 1);
+                }
+            }
+        }
+
+        if (Map != null)
+        {
+            foreach (var kv in Map)
+            {
+                if (kv.Value.Value != null)
+                {
+                    Keys[key] = kv.Key;
+                    key = kv.Key;
+                }
+            }
+        }
+
+        lastKey = key;
     }
 }
 

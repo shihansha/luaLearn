@@ -21,7 +21,7 @@ public class LuaStack
         slots = new List<LuaValue>(size);
         for (int i = 0; i < size; i++)
         {
-            slots.Add(new LuaValue(null));
+            slots.Add(LuaValue.Nil);
         }
         Top = 0;
         this.state = state;
@@ -32,7 +32,7 @@ public class LuaStack
         int free = slots.Count - Top;
         for (int i = free; i < n; i++)
         {
-            slots.Add(new LuaValue(null));
+            slots.Add(LuaValue.Nil);
         }
     }
 
@@ -54,7 +54,7 @@ public class LuaStack
         }
         Top--;
         LuaValue val = slots[Top];
-        slots[Top] = new LuaValue(null);
+        slots[Top] = LuaValue.Nil;
         return val;
     }
 
@@ -133,7 +133,7 @@ public class LuaStack
             }
             else
             {
-                Push(new LuaValue(null));
+                Push(LuaValue.Nil);
             }
         }
     }
@@ -156,7 +156,7 @@ public class LuaStack
             var c = Closure;
             if (c == null || uvIdx >= (c.Upvals?.Length ?? 0))
             {
-                return new LuaValue(null);
+                return LuaValue.Nil;
             }
             return c.Upvals[uvIdx].Value;
         }
@@ -171,7 +171,7 @@ public class LuaStack
         {
             return slots[absIdx - 1];
         }
-        return new LuaValue(null);
+        return LuaValue.Nil;
     }
 
     public LuaValue this[int idx]
