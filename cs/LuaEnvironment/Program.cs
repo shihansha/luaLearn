@@ -11,20 +11,26 @@ namespace LuaEnvironment
         {
             if (args.Length >= 1)
             {
-                var data = File.ReadAllBytes(args[0]);
-                var ls = new LuaState();
-                ProgramLuaState = ls;
-                ls.Register(nameof(Print).ToLower(), Print);
-                ls.Register(nameof(GetMetatable).ToLower(), GetMetatable);
-                ls.Register(nameof(SetMetatable).ToLower(), SetMetatable);
-                ls.Register(nameof(Next).ToLower(), Next);
-                ls.Register(nameof(Pairs).ToLower(), Pairs);
-                ls.Register(nameof(IPairs).ToLower(), IPairs);
-                ls.Load(data, "chunk", "b");
-                ls.Call(0, 0);
+                //var data = File.ReadAllBytes(args[0]);
+                //var ls = new LuaState();
+                //ProgramLuaState = ls;
+                //ls.Register(nameof(Print).ToLower(), Print);
+                //ls.Register(nameof(GetMetatable).ToLower(), GetMetatable);
+                //ls.Register(nameof(SetMetatable).ToLower(), SetMetatable);
+                //ls.Register(nameof(Next).ToLower(), Next);
+                //ls.Register(nameof(Pairs).ToLower(), Pairs);
+                //ls.Register(nameof(IPairs).ToLower(), IPairs);
+                //ls.Register(nameof(Error).ToLower(), Error);
+                //ls.Register(nameof(PCall).ToLower(), PCall);
+                //ls.Load(data, "chunk", "b");
+                //ls.Call(0, 0);
+
+                string data = File.ReadAllText(args[0]);
+                TestLexer(data, args[0]);
             }
         }
 
+        #region VM
         private static int Print(ILuaState ls)
         {
             int nArgs = ls.GetTop();
@@ -109,5 +115,47 @@ namespace LuaEnvironment
             ls.PushInteger(0);
             return 3;
         }
+
+        private static int Error(ILuaState ls)
+        {
+            return ls.Error();
+        }
+
+        private static int PCall(ILuaState ls)
+        {
+            int nArgs = ls.GetTop() - 1;
+            var status = ls.PCall(nArgs, -1, 0);
+            ls.PushBoolean(status == ErrState.Ok);
+            ls.Insert(1);
+            return ls.GetTop();
+        }
+        #endregion
+        #region Lex
+        private static void TestLexer(string chunk, string chunkName)
+        {
+            Lexer lexer = new Lexer(chunk, chunkName);
+            while (true)
+            {
+                var (line, kind, token) = lexer.NextToken();
+                Console.WriteLine($"[{line:D2}] [{KindToCategory(kind), -10}]: {token}");
+                if (kind == TokenType.EOF)
+                {
+                    break;
+                }
+            }
+        }
+
+        private static string KindToCategory(TokenType kind)
+        {
+            if (kind < TokenType.SEP_SEMI) return "other";
+            else if (kind <= TokenType.SEP_RCURLY) return "separator";
+            else if (kind <= TokenType.OP_NOT) return "operator";
+            else if (kind <= TokenType.KW_WHILE) return "keyword";
+            else if (kind == TokenType.IDENTIFIER) return "identifier";
+            else if (kind == TokenType.NUMBER) return "number";
+            else if (kind == TokenType.STRING) return "string";
+            else return "other";
+        }
+        #endregion
     }
 }

@@ -46,3 +46,16 @@ public static class Consts
     public const long LUA_RIDX_GLOBALS = 2;
 }
 
+public enum ErrState
+{
+    Ok = 0,
+    Yield,
+    ErrRun,
+    ErrSyntax,
+    ErrMem,
+    ErrGCMM,
+    ErrErr,
+    ErrFile
+}
+
+

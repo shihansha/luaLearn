@@ -32,7 +32,7 @@ public partial class LuaState
             return;
         }
 
-        throw new Exception("arithmetic error!");
+        throw new LuaException("arithmetic error!");
 
         static LuaValue ArithSub(LuaValue a, LuaValue b, Operator op)
         {

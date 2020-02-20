@@ -5,7 +5,7 @@ using System.Text;
 
 public partial class LuaState
 {
-    public int Load(byte[] chunk, string chunkName, string mode)
+    public ErrState Load(byte[] chunk, string chunkName, string mode)
     {
         var proto = Prototype.Undump(chunk);
         var c = new LuaClosure(proto);
@@ -15,7 +15,7 @@ public partial class LuaState
             var env = Registry.Get(Consts.LUA_RIDX_GLOBALS);
             c.Upvals[0] = LuaUpValue.CreateClosed(env);
         }
-        return 0;
+        return ErrState.Ok;
     }
 
     public void Call(int nArgs, int nResults)
@@ -48,7 +48,7 @@ public partial class LuaState
         }
         else
         {
-            throw new Exception("not function!");
+            throw new LuaException("not function!");
         }
     }
 

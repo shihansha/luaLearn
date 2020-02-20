@@ -20,7 +20,7 @@ public partial class LuaState
         }
         else
         {
-            throw new Exception("lengh error!");
+            throw new LuaException("lengh error!");
         }
     }
 
@@ -67,7 +67,7 @@ public partial class LuaState
                     continue;
                 }
 
-                throw new Exception("concatenation error!");
+                throw new LuaException("concatenation error!");
             }
         }
         // n == 1, do nothing
@@ -88,6 +88,36 @@ public partial class LuaState
             }
             return false;
         }
-        throw new Exception("table expected!");
+        throw new LuaException("table expected!");
+    }
+
+    public int Error()
+    {
+        var err = LuaStack.Pop();
+        throw new LuaException(err);
+    }
+
+    public ErrState PCall(int nArgs, int nResults, int msgh)
+    {
+        var caller = LuaStack;
+        var status = ErrState.ErrRun;
+
+        try
+        {
+            Call(nArgs, nResults);
+            status = ErrState.Ok;
+            return status;
+        }
+        catch (LuaException e)
+        {
+            while (LuaStack != caller)
+            {
+                PopLuaStack();
+            }
+
+            LuaStack.Push(e.Content);
+        }
+
+        return status;
     }
 }

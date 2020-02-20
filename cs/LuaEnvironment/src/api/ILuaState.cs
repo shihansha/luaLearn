@@ -57,7 +57,7 @@ public interface ILuaState
     void SetField(int idx, string k);
     void SetI(int idx, Int64 n);
     // exec
-    int Load(byte[] chunk, string chunkName, string mode);
+    ErrState Load(byte[] chunk, string chunkName, string mode);
     void Call(int nArgs, int nResults);
     // csharp func call
     void PushCSharpFunction(CSharpFunction cs);
@@ -85,4 +85,7 @@ public interface ILuaState
     LuaType RawGetGlobal(string name);
     void RawSetGlobal(string name);
     bool Next(int idx);
+
+    int Error();
+    ErrState PCall(int nArgs, int nResults, int msgh);
 }

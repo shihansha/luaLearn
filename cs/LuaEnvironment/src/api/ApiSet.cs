@@ -53,7 +53,7 @@ public partial class LuaState
             }
         }
 
-        throw new Exception("not a table!");
+        throw new LuaException("not a table!");
     }
 
     public void SetField(int idx, string k)
@@ -112,7 +112,7 @@ public partial class LuaState
         }
         else
         {
-            throw new Exception("table expected!");
+            throw new LuaException("table expected!");
         }
     }
 }

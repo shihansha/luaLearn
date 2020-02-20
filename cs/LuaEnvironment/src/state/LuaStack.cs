@@ -40,7 +40,7 @@ public class LuaStack
     {
         if (Top == slots.Count)
         {
-            throw new Exception("stack overflow!");
+            throw new LuaException("stack overflow!");
         }
 
         slots[Top++] = val;
@@ -50,7 +50,7 @@ public class LuaStack
     {
         if (Top < 1)
         {
-            throw new Exception("stack underflow!");
+            throw new LuaException("stack underflow!");
         }
         Top--;
         LuaValue val = slots[Top];
@@ -115,7 +115,7 @@ public class LuaStack
             slots[absIdx - 1] = val;
             return;
         }
-        throw new Exception("invalid index!");
+        throw new LuaException("invalid index!");
     }
 
     internal void PushN(LuaValue[] vals, int n)

@@ -60,7 +60,7 @@ internal class Instruction
         }
         else
         {
-            throw new Exception("not implemented op: " + OpName);
+            throw new LuaException("not implemented op: " + OpName);
         }
     }
 }

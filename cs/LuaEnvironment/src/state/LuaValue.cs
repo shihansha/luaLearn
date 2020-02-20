@@ -29,7 +29,7 @@ public class LuaValue
         string _ => LuaType.String,
         LuaTable _ => LuaType.Table,
         LuaClosure _ => LuaType.Function,
-        _ => throw new Exception($"Type {val.Value.GetType()} is not a lua type!")
+        _ => throw new LuaException($"Type {val.Value.GetType()} is not a lua type!")
     };
 
     public (double, bool) ToFloat() => Value switch

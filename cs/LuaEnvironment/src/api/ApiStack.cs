@@ -68,7 +68,7 @@ public partial class LuaState
         int newTop = LuaStack.AbsIndex(idx);
         if (newTop < 0)
         {
-            throw new Exception("stack underflow!");
+            throw new LuaException("stack underflow!");
         }
         int n = LuaStack.Top - newTop;
         if (n > 0)

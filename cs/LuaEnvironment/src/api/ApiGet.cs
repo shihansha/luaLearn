@@ -60,7 +60,7 @@ public partial class LuaState
             }
         }
 
-        throw new Exception("not a table!");
+        throw new LuaException("not a table!");
     }
 
     public LuaType GetField(int idx, string k)

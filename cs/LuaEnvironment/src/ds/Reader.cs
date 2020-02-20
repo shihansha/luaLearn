@@ -79,7 +79,7 @@ internal class Reader
 
     private void Panic(string str)
     {
-        throw new Exception(str);
+        throw new LuaException(str);
     }
 
     public void CheckHeader()

@@ -53,11 +53,11 @@ public class LuaTable
     {
         if (key.Value == null)
         {
-            throw new Exception("table index is nil!");
+            throw new LuaException("table index is nil!");
         }
         if (key.Value is double f && double.IsNaN(f))
         {
-            throw new Exception("table index is NaN!");
+            throw new LuaException("table index is NaN!");
         }
         key = FloatToInteger(key);
 
@@ -164,7 +164,7 @@ public class LuaTable
 
         if (nextKey == null && key != null && key != lastKey)
         {
-            throw new Exception("invalid key to 'next'");
+            throw new LuaException("invalid key to 'next'");
         }
 
         return nextKey;

@@ -12,7 +12,7 @@ public partial class LuaState
             CompareOp.Eq => Eq(a, b, this),
             CompareOp.Lt => Lt(a, b, this),
             CompareOp.Le => Le(a, b, this),
-            _ => throw new Exception("invalid compare op!")
+            _ => throw new LuaException("invalid compare op!")
         };
 
         static bool Lt(LuaValue a, LuaValue b, ILuaState ls)
@@ -47,7 +47,7 @@ public partial class LuaState
                 return (bool)result.Value;
             }
 
-            throw new Exception("comparison error!");
+            throw new LuaException("comparison error!");
         }
 
         static bool Le(LuaValue a, LuaValue b, ILuaState ls)
@@ -86,7 +86,7 @@ public partial class LuaState
                 return !(bool)result2.Value;
             }
 
-            throw new Exception("comparison error!");
+            throw new LuaException("comparison error!");
         }
 
     }
