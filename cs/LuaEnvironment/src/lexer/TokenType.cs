@@ -65,6 +65,8 @@ public enum TokenType
     OP_SUB = OP_MINUS,
     OP_BNOT = OP_WAVE,
     OP_BXOR = OP_WAVE,
+
+    UNEXPECTED = -1
 }
 
 public static class Keywords

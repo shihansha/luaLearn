@@ -8,7 +8,6 @@ public class Lexer
 {
     private string chunk; // 源代码
     private readonly string chunkName; // 源文件名
-    private int line; // 当前行号
     private string nextToken;
     private TokenType nextTokenKind;
     private int nextTokenLine;
@@ -26,20 +25,39 @@ public class Lexer
     {
         this.chunk = chunk;
         this.chunkName = chunkName;
-        line = 1;
+        Line = 1;
     }
 
-    public int Line => line;
+    private int line;
+    public int Line
+    {
+        get => line;
+        private set
+        {
+            if (value != line)
+            {
+                // Console.WriteLine("line add: " + (value - line));
+                line = value;
+            }
+        }
+    }
 
     public TokenType LookAhead()
+    {
+        var val = LookAheadInside();
+        // Console.WriteLine("look ahead: " + val);
+        return val;
+    }
+
+    private TokenType LookAheadInside()
     {
         if (nextTokenLine > 0)
         {
             return nextTokenKind;
         }
-        int currentLine = this.line;
+        int currentLine = this.Line;
         var (line, kind, token) = NextToken();
-        this.line = currentLine;
+        this.Line = currentLine;
         nextTokenLine = line;
         nextTokenKind = kind;
         nextToken = token;
@@ -53,12 +71,19 @@ public class Lexer
 
     public (int line, TokenType kind, string token) NextToken()
     {
+        var val = NextTokenInside();
+        // Console.WriteLine("next token: " + val.kind);
+        return val;
+    }
+
+    private (int line, TokenType kind, string token) NextTokenInside()
+    {
         if (nextTokenLine > 0)
         {
             int line = nextTokenLine;
             TokenType kind = nextTokenKind;
             string token = nextToken;
-            this.line = nextTokenLine;
+            this.Line = nextTokenLine;
             nextTokenLine = 0;
             return (line, kind, token);
         }
@@ -66,37 +91,37 @@ public class Lexer
         SkipWhiteSpaces();
         if (chunk.Length == 0)
         {
-            return (line, TokenType.EOF, "EOF");
+            return (Line, TokenType.EOF, "EOF");
         }
 
         switch (chunk[0])
         {
-            case ';': Next(1); return (line, TokenType.SEP_SEMI, ";");
-            case ',': Next(1); return (line, TokenType.SEP_COMMA, ",");
-            case '(': Next(1); return (line, TokenType.SEP_LPAREN, "(");
-            case ')': Next(1); return (line, TokenType.SEP_RPAREN, ")");
-            case ']': Next(1); return (line, TokenType.SEP_RBRACK, "]");
-            case '{': Next(1); return (line, TokenType.SEP_LCURLY, "{");
-            case '}': Next(1); return (line, TokenType.SEP_RCURLY, "}");
-            case '+': Next(1); return (line, TokenType.OP_ADD, "+");
-            case '-': Next(1); return (line, TokenType.OP_MINUS, "-");
-            case '*': Next(1); return (line, TokenType.OP_MUL, "*");
-            case '^': Next(1); return (line, TokenType.OP_POW, "^");
-            case '%': Next(1); return (line, TokenType.OP_MOD, "%");
-            case '&': Next(1); return (line, TokenType.OP_BAND, "&");
-            case '|': Next(1); return (line, TokenType.OP_BOR, "|");
-            case '#': Next(1); return (line, TokenType.OP_LEN, "#");
+            case ';': Next(1); return (Line, TokenType.SEP_SEMI, ";");
+            case ',': Next(1); return (Line, TokenType.SEP_COMMA, ",");
+            case '(': Next(1); return (Line, TokenType.SEP_LPAREN, "(");
+            case ')': Next(1); return (Line, TokenType.SEP_RPAREN, ")");
+            case ']': Next(1); return (Line, TokenType.SEP_RBRACK, "]");
+            case '{': Next(1); return (Line, TokenType.SEP_LCURLY, "{");
+            case '}': Next(1); return (Line, TokenType.SEP_RCURLY, "}");
+            case '+': Next(1); return (Line, TokenType.OP_ADD, "+");
+            case '-': Next(1); return (Line, TokenType.OP_MINUS, "-");
+            case '*': Next(1); return (Line, TokenType.OP_MUL, "*");
+            case '^': Next(1); return (Line, TokenType.OP_POW, "^");
+            case '%': Next(1); return (Line, TokenType.OP_MOD, "%");
+            case '&': Next(1); return (Line, TokenType.OP_BAND, "&");
+            case '|': Next(1); return (Line, TokenType.OP_BOR, "|");
+            case '#': Next(1); return (Line, TokenType.OP_LEN, "#");
             case ':':
                 {
                     if (Test("::"))
                     {
                         Next(2);
-                        return (line, TokenType.SEP_LABEL, "::");
+                        return (Line, TokenType.SEP_LABEL, "::");
                     }
                     else
                     {
                         Next(1);
-                        return (line, TokenType.SEP_COLON, ":");
+                        return (Line, TokenType.SEP_COLON, ":");
                     }
                 }
             case '/':
@@ -104,12 +129,12 @@ public class Lexer
                     if (Test("//"))
                     {
                         Next(2);
-                        return (line, TokenType.OP_IDIV, "//");
+                        return (Line, TokenType.OP_IDIV, "//");
                     }
                     else
                     {
                         Next(1);
-                        return (line, TokenType.OP_DIV, "/");
+                        return (Line, TokenType.OP_DIV, "/");
                     }
                 }
             case '~':
@@ -117,12 +142,12 @@ public class Lexer
                     if (Test("~="))
                     {
                         Next(2);
-                        return (line, TokenType.OP_NE, "~=");
+                        return (Line, TokenType.OP_NE, "~=");
                     }
                     else
                     {
                         Next(1);
-                        return (line, TokenType.OP_WAVE, "~");
+                        return (Line, TokenType.OP_WAVE, "~");
                     }
                 }
             case '=':
@@ -130,12 +155,12 @@ public class Lexer
                     if (Test("=="))
                     {
                         Next(2);
-                        return (line, TokenType.OP_EQ, "==");
+                        return (Line, TokenType.OP_EQ, "==");
                     }
                     else
                     {
                         Next(1);
-                        return (line, TokenType.OP_ASSIGN, "=");
+                        return (Line, TokenType.OP_ASSIGN, "=");
                     }
                 }
             case '<':
@@ -143,17 +168,17 @@ public class Lexer
                     if (Test("<<"))
                     {
                         Next(2);
-                        return (line, TokenType.OP_SHL, "<<");
+                        return (Line, TokenType.OP_SHL, "<<");
                     }
                     else if (Test("<="))
                     {
                         Next(2);
-                        return (line, TokenType.OP_LE, "<=");
+                        return (Line, TokenType.OP_LE, "<=");
                     }
                     else
                     {
                         Next(1);
-                        return (line, TokenType.OP_LT, "<");
+                        return (Line, TokenType.OP_LT, "<");
                     }
                 }
             case '>':
@@ -161,17 +186,17 @@ public class Lexer
                     if (Test(">>"))
                     {
                         Next(2);
-                        return (line, TokenType.OP_SHR, ">>");
+                        return (Line, TokenType.OP_SHR, ">>");
                     }
                     else if (Test(">="))
                     {
                         Next(2);
-                        return (line, TokenType.OP_GE, ">=");
+                        return (Line, TokenType.OP_GE, ">=");
                     }
                     else
                     {
                         Next(1);
-                        return (line, TokenType.OP_GT, ">");
+                        return (Line, TokenType.OP_GT, ">");
                     }
                 }
             case '.':
@@ -179,57 +204,62 @@ public class Lexer
                     if (Test("..."))
                     {
                         Next(3);
-                        return (line, TokenType.VARARG, "...");
+                        return (Line, TokenType.VARARG, "...");
                     }
                     else if (Test(".."))
                     {
                         Next(2);
-                        return (line, TokenType.OP_CONCAT, "..");
+                        return (Line, TokenType.OP_CONCAT, "..");
                     }
                     else if (chunk.Length == 1 || !IsDigit(chunk[1]))
                     {
                         Next(1);
-                        return (line, TokenType.SEP_DOT, ".");
+                        return (Line, TokenType.SEP_DOT, ".");
                     }
                     break;
                 }
             case '[':
                 if (Test("[[") || Test("[="))
                 {
-                    return (line, TokenType.STRING, ScanLongString());
+                    string token = ScanLongString();
+                    return (Line, TokenType.STRING, token);
                 }
                 else
                 {
                     Next(1);
-                    return (line, TokenType.SEP_LBRACK, "[");
+                    return (Line, TokenType.SEP_LBRACK, "[");
                 }
             case '\'':
             case '"':
-                return (line, TokenType.STRING, ScanShortString());
+                {
+                    string token = ScanShortString();
+                    return (Line, TokenType.STRING, token);
+                }
         }
 
         char c = chunk[0];
         if (c == '.' || IsDigit(c))
         {
             string token = ScanNumber();
-            return (line, TokenType.NUMBER, token);
+            return (Line, TokenType.NUMBER, token);
         }
         if (c == '_' || IsLatter(c))
         {
             string token = ScanIdentifier();
             if (Keywords.Map.TryGetValue(token, out TokenType kind))
             {
-                return (line, kind, token);
+                return (Line, kind, token);
             }
             else
             {
-                return (line, TokenType.IDENTIFIER, token);
+                return (Line, TokenType.IDENTIFIER, token);
             }
         }
 
         Error("unexpected symbol near {0}", c);
 
         throw new Exception("unreachable!");
+
     }
 
     public (int line, string token) NextTokenOfKind(TokenType kind)
@@ -284,7 +314,8 @@ public class Lexer
             str = str[1..(str.Length - 1)];
             if (str.IndexOf('\\') >= 0)
             {
-                line += reNewLine.Matches(str).Count;
+                int newLineCount = reNewLine.Matches(str).Count;
+                Line += newLineCount;
                 str = Escape(str);
             }
             return str;
@@ -419,7 +450,7 @@ public class Lexer
         Next(closingLongBracketIdx + closingLongBracket.Length);
 
         str = reNewLine.Replace(str, "\n");
-        line += str.Count(a => a == '\n');
+        Line += str.Count(a => a == '\n');
         if (str.Length > 0 && str[0] == '\n')
         {
             str = str[1..];
@@ -430,7 +461,7 @@ public class Lexer
     private void Error(string f, params object[] a)
     {
         string err = string.Format(f, a);
-        err = $"{chunkName}:{line}: {err}";
+        err = $"{chunkName}:{Line}: {err}";
         throw new LexerException(err);
     }
 
@@ -450,12 +481,12 @@ public class Lexer
             else if (Test("\r\n") || Test("\n\r"))
             {
                 Next(2);
-                line += 1;
+                Line += 1;
             }
             else if (IsNewLine(chunk[0]))
             {
                 Next(1);
-                line += 1;
+                Line += 1;
             }
             else if (IsWhiteSpace(chunk[0]))
             {

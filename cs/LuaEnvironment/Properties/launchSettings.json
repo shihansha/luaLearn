@@ -2,7 +2,7 @@
   "profiles": {
     "LuaEnvironment": {
       "commandName": "Project",
-      "commandLineArgs": "\"lua/ch02/hello_world.lua\"",
+      "commandLineArgs": "\"lua/lua_test.lua\"",
       "workingDirectory": "C:\\Users\\SSG\\Desktop\\luaLearn"
     }
   }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LuaEnvironment.src.parser;
+using System;
 using System.IO;
 using static LuaDebugUtils;
 
@@ -26,7 +27,8 @@ namespace LuaEnvironment
                 //ls.Call(0, 0);
 
                 string data = File.ReadAllText(args[0]);
-                TestLexer(data, args[0]);
+                //TestLexer(data, args[0]);
+                TestParser(data, args[0]);  
             }
         }
 
@@ -137,12 +139,19 @@ namespace LuaEnvironment
             while (true)
             {
                 var (line, kind, token) = lexer.NextToken();
-                Console.WriteLine($"[{line:D2}] [{KindToCategory(kind), -10}]: {token}");
+                Console.WriteLine($"[{line:D2}] [{KindToCategory(kind),-10}]: {token}");
                 if (kind == TokenType.EOF)
                 {
                     break;
                 }
             }
+        }
+
+        private static void TestParser(string chunk, string chunkName)
+        {
+            var ast = Parser.Parse(chunk, chunkName);
+            string b = Newtonsoft.Json.JsonConvert.SerializeObject(ast, Newtonsoft.Json.Formatting.Indented);
+            Console.WriteLine(b);
         }
 
         private static string KindToCategory(TokenType kind)
